@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:vendasmobx/app/modules/home/home_controller.dart';
 import 'package:vendasmobx/app/modules/home/home_module.dart';
+import 'package:vendasmobx/app/modules/pessoa_list/pessoa_list_module.dart';
+import 'package:vendasmobx/app/modules/produto_list/produto_list_module.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -20,8 +22,16 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _controller = HomeModule.to.bloc<HomeController>();
     _itensDrawer = [
-      ItemDrawer("Clientes", Icons.people),
-      ItemDrawer("Produtos", Icons.shopping_cart),
+      ItemDrawer(
+        title: "Clientes",
+        icon: Icons.people,
+        load: () => PessoaListModule(),
+      ),
+      ItemDrawer(
+        title: "Produtos",
+        icon: Icons.shopping_cart,
+        load: () => ProdutoListModule(),
+      ),
     ];
   }
 
@@ -32,9 +42,7 @@ class _HomePageState extends State<HomePage> {
         return Scaffold(
           appBar: getAppBar(_controller.current_page),
           drawer: getDrawer(_controller.current_page),
-          body: Column(
-            children: <Widget>[],
-          ),
+          body: getBody(_controller.current_page),
         );
       },
     );
@@ -76,16 +84,20 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  Widget getBody(int currentPage) {
+    return _itensDrawer[currentPage].load();
+  }
 }
 
 class ItemDrawer {
-  String title;
-  IconData icon;
-  Widget _child;
+  final String title;
+  final IconData icon;
+  final Function load;
 
-  ItemDrawer(this.title, this.icon);
-
-  Widget load<T>() {
-    return Container();
-  }
+  ItemDrawer({
+    this.title,
+    this.icon,
+    this.load,
+  });
 }
